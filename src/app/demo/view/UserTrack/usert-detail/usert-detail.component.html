@@ -2,7 +2,7 @@
     (onHide)="onDetailPanelClose()">
     <p-tabView id="detail-tabbing">
         <p-tabPanel header="User Info">
-            <div class="grid">
+            <div class="grid mt-1">
                 <div class="md:col-12 col-12 text-right">
                     <div class="">
                         <div class="dropdown">
@@ -18,21 +18,13 @@
                                         (onRangeChange)="onRangeChange($event)"
                                         (onDateChange)="onDateChange($event)"></shared-date-range>
                                 </div>
-                                <!-- <div class="btun-box">
-                                       <ul class="left-list">
-                                           <li> <button>Today</button> </li>
-                                           <li> <button>Yesterday</button> </li>
-                                           <li> <button>Monthly</button> </li>
-                                           <li> <button>Total</button> </li>
-                                        </ul>
-                                   </div> -->
-
+                               
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-    <div class="grid">
+            </div> 
+            <div class="grid">
         <div class="md:col-3 col-12">
             <div class="item">
                 <h5>Username</h5>
@@ -60,7 +52,7 @@
             </div>
         </div>
         <div class="col-12">
-            <p-table #dt [value]="userTrackDetail.userTrackingList.results" [columns]="cols" [lazy]="true"
+            <p-table #trackTable [value]="userTrackDetail.userTrackingList.results" [columns]="cols" [lazy]="true"
                 (onLazyLoad)="loadUserTracksByUserId($event)" [totalRecords]="totalRecords" [rows]="10"
                 [paginator]="true" [showCurrentPageReport]="true"
                 currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" selectionMode="multiple"
@@ -118,10 +110,103 @@
                 </ng-template>
             </p-table>
         </div>
-    </div>
+            </div>
         </p-tabPanel>
         <p-tabPanel header="Vehicle Track">
-            </p-tabPanel>
+            <div class="grid mt-1">
+                <div class="md:col-12 col-12 text-right" style="display: flex; justify-content: flex-end; align-items: center;">
+                    <div class="dropdown" style="margin-right: 10px;">
+                        <button onclick="myFunction2()" class="dropbtn2" title="Filter" style="margin-top: 7px;background: #ef591f;">
+                            <img src="../../../assets/layout/images/filter-16.png" alt="">
+                        </button>
+                        <div id="myDropdown2" class="dropdown-content2" style="margin-top: 0;">
+                            <div class="calender-box">
+                                <shared-date-range [startDate]="startDate" [endDate]="endDate" [loading]="loading"
+                                    (onRangeChange)="onRangeChangeVehicle($event)"
+                                    (onDateChange)="onDateChange($event)">
+                                </shared-date-range>
+                            </div>
+                        </div>
+                    </div>
+                
+                    <div class="custom-in-box transaction-filter mt-2">
+                        <i title="Reset Filter" class="pi pi-times" (click)="resetDataTable(vehicleTable)"></i>
+                        <input pInputText type="text" [(ngModel)]="filterGlobalValue" 
+                            (keyup.enter)="vehicleTable.filterGlobal($event.target.value, 'contains')" 
+                            placeholder="Type here" class="search-input p-0 tran-search" />
+                        <span (click)="vehicleTable.filterGlobal(filterGlobalValue, 'contains')">Search</span>
+                    </div>
+                </div>
+                
+                
+            </div>
+            <div class="col-12">
+                <p-table #vehicleTable 
+                [value]="userVehicleDetail?.userVehicleList?.results" 
+                [columns]="cols" 
+                [lazy]="true"
+                (onLazyLoad)="loadUserVehiclesByUserId($event)" 
+                [totalRecords]="totalRecordsForVehicle" 
+                [rows]="10"
+                [paginator]="true" 
+                [showCurrentPageReport]="true"
+                currentPageReportTemplate="Showing {first} to {last} of {{totalRecordsForVehicle}} entries"
+                selectionMode="multiple"
+                [rowHover]="true" 
+                dataKey="vehicleNumber" 
+                stateStorage="local" 
+                stateKey="UserVehicleDao-local"
+                [responsive]="true" 
+                [lazyLoadOnInit]="false">
+
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <!-- <th style="width: 3rem">
+                                <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                            </th> -->
+                            <th pSortableColumn="username">Username
+                                <!-- <p-sortIcon field="username"></p-sortIcon> -->
+                            </th>
+                            <th pSortableColumn="vehicleNumber">Vehicle Number
+                                <p-sortIcon field="vehicleNumber"></p-sortIcon>
+                            </th>
+                            <th pSortableColumn="status">Status
+                                <p-sortIcon field="status"></p-sortIcon>
+                            </th>
+                            <th pSortableColumn="checkIn">Check In
+                                <p-sortIcon field="checkIn"></p-sortIcon>
+                            </th>
+                            <th pSortableColumn="checkOut">Check Out
+                                <p-sortIcon field="checkOut"></p-sortIcon>
+                            </th>
+                        </tr>
+                    </ng-template>
+        
+
+                    <ng-template pTemplate="body" let-userVehicle let-rowIndex="rowIndex">
+                        <tr [pSelectableRow]="userVehicle" [pSelectableRowIndex]="rowIndex">
+                            <!-- <td>
+                                <p-tableCheckbox [value]="userVehicle"></p-tableCheckbox>
+                            </td> -->
+                            <td><span class="p-column-title">Username</span> {{userVehicle.userName}}</td>
+                            <td><span class="p-column-title">Vehicle Number</span> {{userVehicle.vehicleNumber}}</td>
+                            <td><span class="p-column-title">Status</span> {{userVehicle.status}}</td>
+                            <td><span class="p-column-title">Check In</span> {{userVehicle.checkInTime | date: "medium"}}</td>
+                            <td><span class="p-column-title">Check Out</span> {{userVehicle.checkOutTime | date: "medium"}}</td>
+                        </tr>
+                    </ng-template>
+        
+                    <ng-template pTemplate="footer">
+                        <tr *ngIf="totalRecords === 0">
+                            <td colspan="6" class="text-center">
+                                <div>No user vehicle tracking history right now</div>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </p-tabPanel>
+        
     </p-tabView>
     <!-- <h3 class="text-center" style="color:#6E6E6E;font-weight: 600;font-family: primaryFontBold;"><span
             style="border-bottom: 3px solid #ef591f;padding-bottom: 3px;">User Info</span></h3> -->

@@ -5,6 +5,7 @@ import { environment } from 'src/environments/environment';
 import { UserFormDao, UserFormDaoValues } from '../domain/Dao/User/UserFormDao';
 import { UserListResponse } from '../domain/Dao/User/UserListDao';
 import { AllUserTrackResp, UserTrackDetailResp } from '../domain/Dao/User/UserTrackingDao';
+import { UserVehicleDetailResp } from '../domain/Dao/User/UserVehicleDao';
 import { EditUserDto } from '../domain/Dto/Users/EditUserDto';
 import { NewUserDto } from '../domain/Dto/Users/NewUserDto';
 
@@ -17,7 +18,7 @@ export class UserService {
 
 
     constructor(private _http: HttpClient) { }
-
+    
     getAllUsers(pageIndex: number, pageSize: number, globalFilter: string, sortField: string, sortOrder: number, dateRangeStr: string) {
         return this._http.get<UserListResponse>(`${environment.apiUrl}/api/v2/AdminUsers/list?pageSize=${pageSize}&PageNumber=${pageIndex}&sortField=${sortField}&sortOrder=${sortOrder}&globalFilter=${globalFilter}${dateRangeStr}`)
             .toPromise()
@@ -71,6 +72,7 @@ export class UserService {
             .then(data => data.data);
     }
 
+
     getUserTrackDetailResp(
         userId: string,
         selectedLogStatus: string,
@@ -87,6 +89,21 @@ export class UserService {
         &globalFilter=${globalFilter}&selectedLogStatus=${selectedLogStatus}&isWithinZone=${isWithinZone}${dateRangeStr}`)
             .toPromise()
             .then(res => res as UserTrackDetailResp)
+    }
+
+    getUserVehicleDetailResp(
+        userId: string,
+        dateRangeStr: string,
+        pageIndex: number = 1,
+        pageSize: number = 10,
+        globalFilter: string = "",
+        sortField: string = "",
+        sortOrder: number = -1
+    ) {
+        globalFilter = !globalFilter ? "" : globalFilter
+        return this._http.get<any>(`${environment.apiUrl}/api/v1/AdminUserTracking/getuservehiclesdetails?userId=${userId}&pageSize=${pageSize}&PageNumber=${pageIndex}&globalFilter=${globalFilter}&sortField=${sortField}&sortOrder=${sortOrder}${dateRangeStr}`)
+            .toPromise()
+            .then(res => res as UserVehicleDetailResp)
     }
     // getParentName(parentId) {
     //     return this._http.get<VehicleDetailsdaoResult>(`${environment.apiUrl}api/v2/AdminUsers/vehicaleDetails?parentId=${parentId}`);
